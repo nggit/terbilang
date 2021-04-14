@@ -3,6 +3,14 @@
 # https://github.com/nggit/terbilang
 # Copyright (c) 2021 nggit.
 #
+import sys
+
+if sys.platform == 'win32':
+    GREEN  = ''
+    NORMAL = ''
+else:
+    GREEN  = '\033[92m'
+    NORMAL = '\033[0m'
 
 class Terbilang:
     def __init__(self, num=''):
@@ -66,7 +74,8 @@ class Terbilang:
         num = 0
         while num != '':
             num = self._input(' Masukkan angka (maks. 72 digit) -->|'.rjust(72, '-') + '\n')
-            print('\033[92m%s\033[0m' % self.parse(num).get_result())
+            print('%s%s%s' % (GREEN, self.parse(num).get_result(), NORMAL))
+        return None
 
 if __name__ == '__main__':
     t = Terbilang()
