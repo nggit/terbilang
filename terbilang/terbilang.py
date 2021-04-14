@@ -25,7 +25,7 @@ class Terbilang:
         except NameError:
             self._input = input
 
-    def get_result(self):
+    def getresult(self):
         return ' '.join([r for r in self._result if r != '']).rstrip(', ').replace('satu ratus', 'seratus') \
                                                                           .replace('satu ribu', 'seribu') \
                                                                           .replace(';', '')
@@ -74,7 +74,7 @@ class Terbilang:
         num = 0
         while num != '':
             num = self._input(' Masukkan angka (maks. 72 digit) -->|'.rjust(72, '-') + '\n')
-            print('%s%s%s' % (GREEN, self.parse(num).get_result(), NORMAL))
+            print('%s%s%s' % (GREEN, self.parse(num).getresult(), NORMAL))
         return None
 
 if __name__ == '__main__':
