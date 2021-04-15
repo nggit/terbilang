@@ -57,7 +57,7 @@ class Terbilang:
                     num___    = num__[:len(num__) - s_index__ * 2]
                     if int(num___) < len(self._num_str):
                         self._result.append((self._num_str[int(num___)] + ' ' + self._suffixes[2][s_index__]).rstrip()) # ratus
-                    elif len(num___) == 2:
+                    else:
                         if int(num___[0]) == 1:
                             self._result.append(self._num_str[int(num___[1])] + ' ' + self._suffixes[1]) # belas
                         else:
