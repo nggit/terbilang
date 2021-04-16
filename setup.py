@@ -8,7 +8,7 @@ with open('README.md') as fh:
 setup(
     name='terbilang',
     packages=['terbilang'],
-    version='0.0.3',
+    version='0.0.4',
     license='MIT',
     author='nggit',
     author_email='contact@anggit.com',
