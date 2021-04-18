@@ -20,7 +20,8 @@ class Terbilang:
         ]
         self._result     = []
         self._separators = [',', '.']
-        self.parse(num, sep)
+        self.separator   = sep
+        self.parse(num)
         try:
             self._input = raw_input
         except NameError:
@@ -79,9 +80,11 @@ class Terbilang:
             num = num[len(num) - s_index * 12:].lstrip('0')
         return self
 
-    def parse(self, num='', sep=','):
+    def parse(self, num='', sep=''):
         if num == '':
             return self
+        if sep == '':
+           sep = self.separator
         if sep not in self._separators:
             raise ValueError('Harap gunakan koma atau titik sebagai pemisah')
         result = []

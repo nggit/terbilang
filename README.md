@@ -15,11 +15,20 @@ from terbilang import Terbilang
 
 t = Terbilang()
 
+t.parse('1.000,00')
+print(t.getresult()) # seribu koma nol nol
+
 t.parse('1001')
 print(t.getresult()) # seribu satu
 
 t.parse('121001')
 print(t.getresult()) # seratus dua puluh satu ribu satu
+```
+Standar pemisah desimal yang digunakan oleh terbilang adalah koma (,), ini bisa diganti pada saat inisiasi:
+```python
+t = Terbilang(sep='.')
+
+print(t.parse('1000.456').getresult()) # seribu koma empat lima enam
 ```
 terbilang dibuat agar memiliki jangkauan yang lebar, tetapi diharapkan dapat membaca angka dengan lebih *luwes*. Sebagai contoh, "1000 triliun" tidak dibaca sebagai "satu kuadriliun" tetapi "seribu triliun". Sedangkan "1000 juta" tentu akan dibaca sebagai "satu miliar". terbilang akan menampilkan tanda koma jika bilangan sudah mencapai triliunan atau lebih untuk meningkatkan keterbacaan:
 ```python
