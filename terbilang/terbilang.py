@@ -16,7 +16,7 @@ class Terbilang:
     def __init__(self, num='', sep=','):
         self._num_str    = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas']
         self._suffixes   = [
-            'puluh', 'belas', ['', 'ratus'], ['', 'ribu', 'juta', 'miliar'], ['', 'triliun', 'septiliun', 'undesiliun', 'kuindesiliun', 'novemdesiliun']
+            'belas', 'puluh', ['', 'ratus'], ['', 'ribu', 'juta', 'miliar'], ['', 'triliun', 'septiliun', 'undesiliun', 'kuindesiliun', 'novemdesiliun']
         ]
         self._result     = []
         self._separators = [',', '.']
@@ -51,7 +51,7 @@ class Terbilang:
 
     def _read(self, num=''):
         num = self.filter_num(num)
-        if num != num.lstrip('0'):
+        if num.find('0') == 0:
             return self.spell(num)
         if len(num) > 72:
             raise ValueError('Maaf, angka yang anda masukkan terlalu besar')
@@ -69,9 +69,9 @@ class Terbilang:
                         self._result.append((self._num_str[int(num___)] + ' ' + self._suffixes[2][s_index__]).rstrip()) # ratus
                     else:
                         if int(num___[0]) == 1:
-                            self._result.append(self._num_str[int(num___[1])] + ' ' + self._suffixes[1]) # belas
+                            self._result.append(self._num_str[int(num___[1])] + ' ' + self._suffixes[0]) # belas
                         else:
-                            self._result.append((self._num_str[int(num___[0])] + ' ' + self._suffixes[0] + ' ' + self._num_str[int(num___[1])]).rstrip() + ';') # puluh
+                            self._result.append((self._num_str[int(num___[0])] + ' ' + self._suffixes[1] + ' ' + self._num_str[int(num___[1])]).rstrip() + ';') # puluh
                     num__ = num__[len(num__) - s_index__ * 2:].lstrip('0')
                 self._result.append(self._suffixes[3][s_index_]) # ribu, juta, miliar
                 num_ = num_[len(num_) - s_index_ * 3:].lstrip('0')
@@ -80,11 +80,13 @@ class Terbilang:
         return self
 
     def parse(self, num='', sep=','):
+        if num == '':
+            return self
         if sep not in self._separators:
             raise ValueError('Harap gunakan koma atau titik sebagai pemisah')
         result = []
         num    = str(num).strip(' ,.')
-        if num.find('-') == 0:
+        if num.find('-') == 0 and num.strip(',-.0') != '':
             result.append('minus')
         sep_pos = num.rfind(sep)
         if sep_pos > 0:
@@ -94,7 +96,7 @@ class Terbilang:
         else:
             sep_alt     = self._separators[self._separators.index(sep) ^ 1]
             sep_alt_pos = num.find(sep_alt)
-            if num.count(sep_alt) == 1 and len(num[sep_alt_pos:]) != 4:
+            if sep_alt_pos > 0 and num.find('0') == 0 or num.count(sep_alt) == 1 and len(num[sep_alt_pos:]) != 4:
                 result.append(self.getresult(self._read(num[:sep_alt_pos])._result))
                 result.append('koma')
                 result.append(self.spell(num[sep_alt_pos:]).getresult())
