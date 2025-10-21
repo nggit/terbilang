@@ -1,1 +1,1 @@
-from .terbilang import Terbilang
+from .terbilang import Terbilang  # noqa: F401

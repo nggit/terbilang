@@ -14,27 +14,28 @@ else:
 
 
 class Terbilang:
+    _words = ('', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh',
+              'delapan', 'sembilan', 'sepuluh', 'sebelas')
+    _suffixes = (
+        ('belas', 'puluh'), ('', 'ratus'), ('', 'ribu', 'juta', 'miliar'),
+        ('', 'triliun', 'septiliun', 'undesiliun', 'kuindesiliun',
+         'novemdesiliun')
+    )
+
     def __init__(self, num='', sep=','):
-        self._num_str = [
-            '', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh',
-            'delapan', 'sembilan', 'sepuluh', 'sebelas'
-        ]
-        self._suffixes = [
-            'belas', 'puluh', ['', 'ratus'], ['', 'ribu', 'juta', 'miliar'],
-            ['', 'triliun', 'septiliun', 'undesiliun', 'kuindesiliun',
-                'novemdesiliun']
-        ]
-        self._result = []
-        self._separators = [',', '.']
         self.separator = sep
-        self.parse(num)
+        self._separators = (',', '.')
+        self._result = []
 
         try:
             self._input = raw_input
         except NameError:
             self._input = input
 
-    def getresult(self, result=[]):
+        if num:
+            self.parse(num, sep)
+
+    def getresult(self, result=()):
         if result:
             return ' '.join(
                 v for v in result if v != ''
@@ -50,84 +51,76 @@ class Terbilang:
         return num.replace(' ', '')
 
     def spell(self, num=''):
-        del self._result[:]
+        self._result.clear()
 
         for n in num:
             if ord(n) >= 48 and ord(n) <= 57:
                 if n == '0':
                     self._result.append('nol')
                 else:
-                    self._result.append(self._num_str[int(n)])
+                    self._result.append(self._words[int(n)])
 
         return self
 
-    def _read(self, num=''):
-        num = self.filter_num(num)
+    def _read(self, num, level=12):
+        if level == 12:
+            num = self.filter_num(num)
 
-        if num.find('0') == 0:
-            return self.spell(num)
+            if num.startswith('0'):
+                return self.spell(num)
 
-        if len(num) > 72:
-            raise ValueError('Maaf, angka yang anda masukkan terlalu besar')
+            if len(num) > 72:
+                raise ValueError('Angka yang anda masukkan terlalu besar')
 
-        del self._result[:]
+        i = (len(num) - 1) // level
+        part = num[:len(num) - i * level]
 
-        while num != '':
-            s_index = (len(num) - 1) // 12
-            num1 = num[:len(num) - s_index * 12]
+        if level == 12:
+            self._read(part, 3)
+            self._result.append(self._suffixes[3][i] + ',')  # triliun, ...
+        elif level == 3:
+            self._read(part, 2)
+            self._result.append(self._suffixes[2][i])  # ribu, juta, miliar
+        elif level == 2:
+            if int(part) < len(self._words):
+                self._result.append(
+                    (self._words[int(part)] + ' ' +
+                     self._suffixes[1][i]).rstrip()
+                )  # ratus
+            else:
+                if int(part[0]) == 1:
+                    self._result.append(self._words[int(part[1])] + ' ' +
+                                        self._suffixes[0][0])  # belas
+                else:
+                    self._result.append(
+                        (self._words[int(part[0])] + ' ' +
+                         self._suffixes[0][1] + ' ' +
+                         self._words[int(part[1])]).rstrip() + ';'
+                    )  # puluh
 
-            while num1 != '':
-                s_index1 = (len(num1) - 1) // 3
-                num2 = num1[:len(num1) - s_index1 * 3]
+        num = num[len(num) - i * level:].lstrip('0')
 
-                while num2 != '':
-                    s_index2 = (len(num2) - 1) // 2
-                    num3 = num2[:len(num2) - s_index2 * 2]
-
-                    if int(num3) < len(self._num_str):
-                        self._result.append(
-                            (self._num_str[int(num3)] + ' ' +
-                                self._suffixes[2][s_index2]).rstrip()
-                        )  # ratus
-                    else:
-                        if int(num3[0]) == 1:
-                            self._result.append(
-                                self._num_str[int(num3[1])] + ' ' +
-                                self._suffixes[0]
-                            )  # belas
-                        else:
-                            self._result.append(
-                                (self._num_str[int(num3[0])] + ' ' +
-                                    self._suffixes[1] + ' ' +
-                                    self._num_str[int(num3[1])]).rstrip() + ';'
-                            )  # puluh
-
-                    num2 = num2[len(num2) - s_index2 * 2:].lstrip('0')
-
-                # ribu, juta, miliar
-                self._result.append(self._suffixes[3][s_index1])
-                num1 = num1[len(num1) - s_index1 * 3:].lstrip('0')
-
-            # triliun, septiliun, ..., novemdesiliun
-            self._result.append(self._suffixes[4][s_index] + ',')
-            num = num[len(num) - s_index * 12:].lstrip('0')
-
-        return self
-
-    def parse(self, num='', sep=''):
         if num == '':
             return self
 
+        return self._read(num, level)
+
+    def parse(self, num='', sep=''):
         if sep == '':
             sep = self.separator
 
         if sep not in self._separators:
             raise ValueError('Harap gunakan koma atau titik sebagai pemisah')
 
-        result = []
         num = str(num).strip(' ,.')
 
-        if num.find('-') == 0 and num.strip(',-.0') != '':
+        if num == '':
+            return self
+
+        self._result.clear()
+        result = []
+
+        if num.startswith('-') and num.strip(',-.0') != '':
             result.append('minus')
 
         sep_pos = num.rfind(sep)
@@ -140,7 +133,7 @@ class Terbilang:
             sep_alt = self._separators[self._separators.index(sep) ^ 1]
             sep_alt_pos = num.find(sep_alt)
 
-            if (sep_alt_pos > 0 and num.find('0') == 0 or
+            if (sep_alt_pos > 0 and num.startswith('0') or
                     num.count(sep_alt) == 1 and len(num[sep_alt_pos:]) != 4):
                 result.append(
                     self.getresult(self._read(num[:sep_alt_pos])._result)
@@ -153,8 +146,8 @@ class Terbilang:
         self._result[:] = result
         return self
 
-    """ markicob """
     def run(self):
+        """ markicob """
         num = 0
         sep = ','
 
